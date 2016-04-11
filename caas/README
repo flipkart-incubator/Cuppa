@@ -1,0 +1,4 @@
+Caffe as a Service
+
+Generate Thrift File:
+thrift -out . -r --gen py caffe_worker.thrift
