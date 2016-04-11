@@ -1,0 +1,4 @@
+*.pyc
+*/gen-py/
+*/.worker.py.swp
+*.log

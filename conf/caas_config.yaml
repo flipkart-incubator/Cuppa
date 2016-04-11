@@ -1,0 +1,27 @@
+# Config file for Caffe as a Service
+
+#Path to your caffe build (Required)
+caffe:
+  path: build/caffe/python
+
+#Caas will look for models in this directory (Required)
+#Caffe models can be a few GBs in size, so make sure you have enough disk space in this path
+local-store:
+  blob: caffe_models/
+  prototxt: caffe_models/
+
+#Provide an s3 location for caffe models (Optional)
+#If an s3 location is configured, then caffe models will always be fetched from s3 when a model is commissioned. Models will be stored locally in the local-store. If not configured, you will need to place your caffe models in the local-store.
+#s3:
+#  host: http://s3.amazonaws.com
+#  access_key: XXXXXXX
+#  secret_key: YYYYYYY
+#  bucket_name: caffe_models
+
+#Port number for this worker (Required)
+port:
+  start: 9091
+
+worker:
+  host: localhost
+

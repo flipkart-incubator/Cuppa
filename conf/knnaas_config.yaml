@@ -1,0 +1,16 @@
+# Config file for KNN as a Service
+
+
+# Port number on which to run the service. (Required)
+port: 9090
+
+# The number of threads that will run the knn search. (Required)
+# Usually, you will want to set this to the number of cores available 
+# on your system.
+num_threads: 3
+
+# The number of nearest neighbours to return. (Required)
+# For example, if you set this to 5, predict will return the 5 nearest
+# vectors. 
+k: 5
+
