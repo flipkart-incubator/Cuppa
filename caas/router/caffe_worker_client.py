@@ -101,7 +101,6 @@ class CaffeWorkerClient:
                 po = PredictionOutput()
                 po.bo.status == 'Failure'
                 self.logger.error('Predict has failed.. ', exc_info=True)
-                time.sleep(0.1)
             else:
                 break
         return po
