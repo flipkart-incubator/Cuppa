@@ -2,7 +2,7 @@
 
 
 # Port number on which to run the service. (Required)
-port: 9090
+port: 9094
 
 # The number of threads that will run the knn search. (Required)
 # Usually, you will want to set this to the number of cores available 
@@ -12,5 +12,17 @@ num_threads: 3
 # The number of nearest neighbours to return. (Required)
 # For example, if you set this to 5, predict will return the 5 nearest
 # vectors. 
-k: 5
+k: 1000
+
+# Redis configurations
+redis: 
+    # Host ip  where you'll run your redis instance.
+    host: localhost
+    # Port number on which redis runs. Default is 6379.
+    port: 6379 
+    # Database Number for redis, refer to redis documentation. As a default value you can use 1.
+    database: 1
+    # Password for the redis.
+    password: 
+
 
