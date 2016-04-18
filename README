@@ -1,1 +1,10 @@
-**WIP**: ML-Engines
+Homepage: http://flipkart-incubator.github.io/Cuppa
+
+Run your trained machine learning models as prediction APIs.
+
+Currently we support
+
+- Caffe as a Service
+- K-Nearest Neighbours as a service
+
+
