@@ -138,7 +138,6 @@ class WorkerLoadBalancer:
         """
         return self.model_type_to_model_to_worker_list.get(model_type)
 
-
     def get_worker_info(self, worker_id, model_type):
         """
         Returns worker information of a given worker
