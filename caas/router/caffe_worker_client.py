@@ -92,18 +92,20 @@ class CaffeWorkerClient:
         retry_count = 3
         trial_number = 0
         while trial_number < retry_count:
-            ++trial_number
+            trial_number += 1
             try:
                 trans.open()
                 po = client.predict(prediction_input)
-                trans.close()
             except Exception as e:
                 po = PredictionOutput()
-                po.bo.status == 'Failure'
+                po.bo.status = 'Failure'
                 self.logger.error('Predict has failed.. ', exc_info=True)
-                time.sleep(0.1)
             else:
                 break
+            finally:
+                if trans.isOpen():
+                    trans.close()
+
         return po
 
 
