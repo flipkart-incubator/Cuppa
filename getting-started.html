@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cuppa by Flipkart</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Cuppa</h1>
+        <p>KNN as a service and Caffe as a service</p>
+
+        <p class="view"><a href="https://github.com/flipkart-incubator/Cuppa">View the Project on GitHub <small>flipkart-incubator/Cuppa</small></a></p>
+        <p class="view"><a href="getting-started.html">Getting Started </a></p>
+        <p class="view"><a href="examples.html">Examples </a></p>
+        <p class="view"><a href="installation.html">Installation </a></p>
+        <p class="view"><a href="api.html">API </a></p>
+        <p class="view"><a href="caffe-as-a-service.html">Caffe as a Service </a></p>
+        <p class="view"><a href="knn-as-a-service.html">KNN as a Service </a></p>
+
+        <ul>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>
+<a id="intro" class="anchor" href="#intro" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting Started</h3>
+        <p>Cuppa is developed and tested on debian/jessie.</p>
+
+        <p>To get you started quickly, we will be working in a Vagrant environment.</p>
+
+        <p>If you don't already have Vagrant setup, follow these steps -</p>
+        <p><ul>
+            <li>Install Virtual Box - https://www.virtualbox.org/wiki/Downloads</li>
+            <li>Install Vagrant - https://www.vagrantup.com/downloads.html</li>
+            <li>Install vbguest Plugin - Run <code>vagrant plugin install vagrant-vbguest</code></li>
+        </ul>
+        </p>
+
+        <p>Once you've setup Vagrant, create a new directory and download this <a href="https://github.com/flipkart-incubator/Cuppa/Vagrantfile"><code>Vagrantfile</code></a> and the <a href="https://github.com/flipkart-incubator/Cuppa/vagrant_bootstrap.sh"><code>vagrant_bootstrap.sh</code></a> file that Vagrant will use to install required dependencies.</p>
+
+        <p>In the created directory, run</p>
+        <p><pre>vagrant up </pre></p>
+        <p>This will create the virtual machine. This will take some time as Vagrant downloads debian/jessie base image and installs dependencies.
+</p>
+<p>Once the virtual machine is created, log in by running</p>
+<p><pre>vagrant ssh </pre></p>
+
+<p>Clone the Cuppa project here.</p>
+<p><pre>git clone git@github.com:flipkart-incubator/Cuppa.git</pre></p>
+
+<p>Now cd into the Cuppa directory, and run</p>
+<p><pre>fab setup</pre></p>
+
+<p>This will run the setup steps in <code>fabfile.py</code>, which will download and make caffe, build the nearest neighbours code and finally download the models required to run the examples.</p>
+
+<p>Now, that Cuppa is built, we can start the services required to start serving models.</p>
+
+<p>First, bring up an instance of redis. This is required by the KNN service.</p>
+<p><pre>fab start_redis</pre></p>
+
+<p>Now start the router, caffe service and k-nearest neighbours service</p>
+<pre>
+fab start_router<br />
+fab start_caas<br />
+fab start_knnaas
+</pre>
+
+<p>Lets hit the router health check endpoint, so we know its working</p>
+<p><pre>curl localhost:8000/elb-healthcheck</pre></p>
+
+You should see,
+<pre>
+{<br />
+    "title": "Internal Server Error",<br />
+    "description": "Model To Workers Map is Empty! " <br />
+}
+</pre>
+
+<p>Don't worry! This means the router is up and running and that no backend engines are registered to it yet.</p>
+
+<p>Thats it. Setup is complete.</p>
+
+<p>Head over to the <a href="examples.html">examples</a> to run some predictions.</p>
+      </section>
+
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/flipkart-incubator">Flipkart</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
+
+
+
+
