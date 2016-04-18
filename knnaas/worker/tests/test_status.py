@@ -1,3 +1,4 @@
+#
 # Copyright 2012-2016, the original author or authors.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,11 +36,13 @@ def get_client(host, port):
     return client, trans
 
 
-def _decommission():
+def _status():
     client1, trans = get_client(host='localhost', port=9090)
     trans.open()
-    resp1 = client1.decommission()
-    assert(resp1.status == 'Success')
+    resp1 = client1.status()
     trans.close()
-_decommission()
+    assert(resp1.status == 'Success')
+
+_status()
+
 

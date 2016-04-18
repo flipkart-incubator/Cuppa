@@ -49,6 +49,15 @@ class KnnServiceHandler:
         self.logger = logging.getLogger(__name__)
         self.logger.info("[Worker Inited]")
 
+    def status(self):
+
+        """
+        Returns: Success
+        """
+
+        bo = BaseOutput()
+        bo.status = "Success"
+        return bo
 
     def insert(self, model_id, data_point_id, vector, tags):
         self.logger.info('[KnnServiceHandler] [INSERT] [STARTED]')

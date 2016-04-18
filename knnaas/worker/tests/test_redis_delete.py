@@ -36,13 +36,14 @@ class SimplePredictTestCase(unittest.TestCase):
         trans = TTransport.TBufferedTransport(trans)
         proto = TBinaryProtocol.TBinaryProtocolAccelerated(trans)
         client = KnnThriftService.Client(proto)
-        trans.open()
-        return client
+        return client, trans
 
 
     def redis_delete(self, model_id, data_point_id):
-        client1 = self.get_client(host='localhost', port=9090)
+        client1, trans = self.get_client(host='localhost', port=9090)
+        trans.open()
         resp1 = client1.redis_delete(model_id, data_point_id)
+        trans.close()
         return resp1
 
     def test_delete_machine(self):

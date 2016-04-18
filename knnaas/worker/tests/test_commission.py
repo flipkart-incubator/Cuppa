@@ -33,16 +33,17 @@ def get_client(host, port):
     trans = TTransport.TBufferedTransport(trans)
     proto = TBinaryProtocol.TBinaryProtocolAccelerated(trans)
     client = KnnThriftService.Client(proto)
-    trans.open()
     return client
 
 
 def _commission():
-    client1 = get_client(host='localhost', port=9090)
+    client1, trans = get_client(host='localhost', port=9090)
     ci = CommissionInput()
     ci.modelId = 'model-1'
     ci.modelPathsJson = ''
+    trans.open()
     resp1 = client1.commission(ci)
+    trans.close()
     assert(resp1.status == 'Success')
 
 _commission()

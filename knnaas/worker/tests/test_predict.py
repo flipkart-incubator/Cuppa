@@ -40,12 +40,13 @@ class SimplePredictTestCase(unittest.TestCase):
         trans = TTransport.TBufferedTransport(trans)
         proto = TBinaryProtocol.TBinaryProtocolAccelerated(trans)
         client = KnnThriftService.Client(proto)
-        trans.open()
-        return client
+        return client, trans
 
     def _predict(self, model_id, embd, tags, data_point_id, by):
-        client = self.get_client(host='localhost', port=9090)
+        client, trans = self.get_client(host='localhost', port=9090)
+        trans.open()
         resp = client.predict(model_id, embd, tags, data_point_id, by)
+        trans.close()
         return resp
 
     def test_predict_machine(self):

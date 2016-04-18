@@ -39,6 +39,7 @@ struct UpdateOutput {
 }
 
 service KnnThriftService {
+    BaseOutput status()
     KNNLocalResult predict(1: string model_id, 2: list<double> fv, 3: list<string> tv, 4: string data_point_id, 5: i32 by),
     UpdateOutput insert(1: string model_id, 2: string data_point_id, 3: list<double> fv, 4: list<string> tv),
     UpdateOutput remove(1: string model_id, 2: string data_point_id)

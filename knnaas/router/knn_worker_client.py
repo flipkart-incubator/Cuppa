@@ -52,8 +52,6 @@ class KnnWorkerClient:
         self.logger = logging.getLogger(__name__)
         self.load_balancer = load_balancer
         self.logger.info("load balancer inited...")
-#        self.worker_id_to_worker = self.load_balancer.get_all_workers('KNN')
-#        self.model_to_worker_id_list = self.load_balancer.get_model_to_workers_list('KNN')
         self.worker_connections = {}
         self.logger.info("KnnWorkerClient Inited...")
 
@@ -70,7 +68,6 @@ class KnnWorkerClient:
         try:
             self.worker_connections[worker.global_worker_id] = [self.make_clients(worker.host, worker.port) for i in range(10)]
         except Thrift.TException as e:
-            self.logger.error("[MAKE CONNECTION FAILED][HOST: %s]" % worker.global_worker_id, exc_info=True)
             self.logger.error("[TException %s]" % str(e), exc_info=True)
             self.logger.debug("Removing worker %s" % worker)
             self._remove_workers(model_id, [worker])
@@ -91,8 +88,7 @@ class KnnWorkerClient:
             trans = TTransport.TBufferedTransport(trans)
             proto = TBinaryProtocol.TBinaryProtocolAccelerated(trans)
             client = KnnThriftService.Client(proto)
-            trans.open()
-            return client
+            return client, trans
         except Thrift.TException as e:
             raise e
 
@@ -106,7 +102,7 @@ class KnnWorkerClient:
         Returns:
 
         """
-        self.logger.info("_removing workers......")
+        self.logger.info("_removing workers...... %s" % workers_to_remove)
         self.load_balancer.remove_workers('KNN', model_id, workers_to_remove)
         for worker in workers_to_remove:
             if worker.global_worker_id in self.worker_connections.keys():
@@ -136,23 +132,25 @@ class KnnWorkerClient:
         responses = list()
         workers_to_remove = []
         for worker_id in worker_ids:
-            if worker_id in self.worker_connections.keys():
-                client = random.choice(self.worker_connections[worker_id])
-            else:
+            if worker_id not in self.worker_connections.keys():
                 worker = self.load_balancer.get_all_workers('KNN')[worker_id]
                 try:
                     self.make_connections(model_id, worker)
                 except Exception as e:
+                    self.logger.error("could not make connection to: %s, hence skipping it" % worker_id, exc_info=True)
                     continue
-                client = random.choice(self.worker_connections[worker_id])
-                self.logger.debug("[self.worker_connections] %s", self.worker_connections)
+            client, trans = random.choice(self.worker_connections[worker_id])
             try:
+                trans.open()
                 uo = client.insert(model_id, data_point_id, embedding, tags)
                 responses.append(uo)
             except Thrift.TException as tx:
                 self.logger.error("[KnnWorkerClient][_insert Worker Exception][Removing Worker] [worker: %s]" % worker_id ,exc_info=True)
                 workers_to_remove.append(self.load_balancer.get_all_workers('KNN')[worker_id])
                 continue
+            finally:
+                if trans.isOpen():
+                    trans.close()
 
         if len(workers_to_remove) > 0 :
             self._remove_workers(model_id, workers_to_remove)
@@ -187,23 +185,25 @@ class KnnWorkerClient:
         self.logger.debug('worker_ids collected for the given model_id %s' % worker_ids)
         workers_to_remove = []
         for worker_id in worker_ids:
-            if worker_id in self.worker_connections.keys():
-                client = random.choice(self.worker_connections[worker_id])
-            else:
+            if worker_id not in self.worker_connections.keys():
                 worker = self.load_balancer.get_all_workers('KNN')[worker_id]
                 try:
                     self.make_connections(model_id, worker)
                 except Exception as e:
                     continue
-                client = random.choice(self.worker_connections[worker_id])
-                self.logger.debug('chose client %s for worker_id %s' % (client, worker_id))
+            client, trans = random.choice(self.worker_connections[worker_id])
+            self.logger.debug('chose client %s for worker_id %s' % (client, worker_id))
             try:
+                trans.open()
                 uo  = client.remove(model_id, data_point_id)
                 responses.append(uo)
             except Thrift.TException as tx:
                 self.logger.debug("[KnnWorkerClient][_remove Worker Exception][worker : %s]" % worker_id, exc_info=True)
                 workers_to_remove.append(self.load_balancer.get_all_workers('KNN')[worker_id])
                 continue
+            finally:
+                if trans.isOpen():
+                    trans.close()
         self.logger.debug('resp after thrift remove %s' % responses)
         if len(workers_to_remove) > 0:
             self._remove_workers(model_id, workers_to_remove)
@@ -230,6 +230,8 @@ class KnnWorkerClient:
         self.logger.debug('model_id %s data_point_id %s embd %s tags %s by %s' % (model_id, data_point_id, embd, tags, by))
         klr = KNNLocalResult()
         tries = 5
+        client = None
+        trans = None
         while tries > 0:
             try:
                 worker = self.load_balancer.choose_worker('KNN', model_id)
@@ -238,11 +240,17 @@ class KnnWorkerClient:
                 return False, 'No worker for this model, update router map'
             self.logger.info('random worker %s' % worker.global_worker_id)
             try:
-                if worker.global_worker_id in self.worker_connections:
-                    klr = random.choice(self.worker_connections[worker.global_worker_id]).predict(model_id, embd, tags, data_point_id, by)
-                else:
+                if worker.global_worker_id not in self.worker_connections.keys():
                     self.make_connections(model_id, worker)
-                    klr = random.choice(self.worker_connections[worker.global_worker_id]).predict(model_id, embd, tags, data_point_id, by)
+                client, trans = random.choice(self.worker_connections[worker.global_worker_id])
+            except Exception as e:
+                self.logger.debug("[Predict Excepted] [worker: %s] %s" % (worker.global_worker_id, str(e)) , exc_info=True)
+                tries -= 1
+                continue
+            try:
+                client, trans = random.choice(self.worker_connections[worker.global_worker_id])
+                trans.open()
+                klr = client.predict(model_id, embd, tags, data_point_id, by)
                 if klr.values == None:
                     klr.values = []
                     return klr, 'Worker miscalculated, check worker logs'
@@ -254,6 +262,9 @@ class KnnWorkerClient:
                 self._remove_workers(model_id, [worker])
                 self.logger.debug("[PREDICT EXCEPTION tries left %s]" % tries)
                 continue
+            finally:
+                if trans and trans.isOpen():
+                    trans.close()
         self.logger.debug("[Workers Down]")
         return False, 'Workers Down'
 
@@ -280,20 +291,22 @@ class KnnWorkerClient:
                 self.logger.error("[No worker for the given model] %s" % model_id, exc_info=True)
                 return False, 'No worker for this model, update router map'
             try:
-                if worker.global_worker_id in self.worker_connections:
-                    uo = random.choice(self.worker_connections[worker.global_worker_id]).redis_insert(model_id, data_point_id, embd, tags)
-                    self.logger.info("[REDIS DELETE DONE]")
-                    return uo, 'OK'
-                else:
+                if worker.global_worker_id not in self.worker_connections:
                     self.make_connections(model_id, worker)
-                    uo = random.choice(self.worker_connections[worker.global_worker_id]).redis_insert(model_id, data_point_id, embd, tags)
-                    return uo, 'OK'
+                client, trans = random.choice(self.worker_connections[worker.global_worker_id])
+                trans.open()
+                uo = client.redis_insert(model_id, data_point_id, embd, tags)
+                self.logger.info("[REDIS INSERT DONE]")
+                return uo, 'OK'
             except Exception as e:
                 tries -= 1
                 self.logger.error("[REDIS INSERTION EXCEP] [worker: %s] %s" % (worker.global_worker_id, str(e)), exc_info=True)
                 self.logger.debug("[REDIS INSERT tries left %s]" % tries)
                 self._remove_workers(model_id, [worker])
                 continue
+            finally:
+                if trans and trans.isOpen():
+                    trans.close()
         self.logger.debug("REDIS DOWN / Worker Cluster Down?")
         return False, 'REDIS DOWN or Worker Cluster Down ?'
 
@@ -306,7 +319,7 @@ class KnnWorkerClient:
         Returns: Either UpdateOutput or False alongside a message, as a python tuple
 
         """
-        self.logger.info("[REDIS INSERT][STARTED]")
+        self.logger.info("[REDIS DELETE][STARTED]")
         uo = UpdateOutput()
         tries = 5
         while tries > 0:
@@ -317,20 +330,22 @@ class KnnWorkerClient:
                 self.logger.error("[No worker for the given model] %s" % model_id, exc_info=True)
                 return False, 'No worker for this model, update router map'
             try:
-                if worker.global_worker_id in self.worker_connections:
-                    uo = random.choice(self.worker_connections[worker.global_worker_id]).redis_delete(model_id, data_point_id)
-                    self.logger.info("[REDIS DELETE DONE]")
-                    return uo, 'OK'
-                else:
+                if worker.global_worker_id not in self.worker_connections:
                     self.make_connections(model_id, worker)
-                    uo = random.choice(self.worker_connections[worker.global_worker_id]).redis_delete(model_id, data_point_id)
-                    return uo, 'OK'
+                client, trans = random.choice(self.worker_connections[worker.global_worker_id])
+                trans.open()
+                uo = client.redis_delete(model_id, data_point_id)
+                self.logger.info("[REDIS INSERT DONE]")
+                return uo, 'OK'
             except Exception as e:
                 tries -= 1
                 self.logger.error("[REDIS DELETE EXCEP] [worker: %s] %s" % (worker.global_worker_id, str(e)), exc_info=True)
                 self.logger.debug("REDIS DELETE tries left %s" % tries)
                 self._remove_workers(model_id, [worker])
                 continue
+            finally:
+                if trans and trans.isOpen():
+                    trans.close()
         self.logger.debug("REDIS DOWN / Worker Cluster Down?")
         return False,  'REDIS DOWN or Worker Cluster Down ?'
 
