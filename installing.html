@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cuppa by Flipkart</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+          <a href="index.html"><img src="logos-3.png" alt="Cuppa" style="width: 50%; height: 50%" /></a>
+        <p>Caffe and KNN as a service</p>
+
+        <p class="view"><a href="https://github.com/flipkart-incubator/Cuppa">View the Project on GitHub <small>flipkart-incubator/Cuppa</small></a></p>
+        <p class="view"><a href="getting-started.html">Getting Started </a></p>
+        <p class="view"><a href="examples.html">Examples </a></p>
+        <p class="view"><a href="installing.html">Installing </a></p>
+        <p class="view"><a href="API.html">API </a></p>
+                  <p class="view"><a href="caffe-as-a-service.html">Caffe as a Service </a></p>
+                            <p class="view"><a href="knn-as-a-service.html">KNN as a service </a></p>
+
+        <ul>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>
+    <a id="intro" class="anchor" href="#intro" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Installing</h3>
+
+        <h4>Requirements </h4>
+        <p>- Cuppa is developed and tested on debian jessie.</p>
+        <p>- See <a href="https://raw.githubusercontent.com/flipkart-incubator/Cuppa/master/vagrant_bootstrap.sh">vagrant_bootstrap.sh</a> for the required dependencies</p>
+        <p>- K-nearest neighbours requires a redis server (configuration details below)</p>
+        <p>- Caffe as a service requires caffe built and available in the path (see configuration for how to setup the path). For building caffe, see the <code>setup</code> task in <a href="https://raw.githubusercontent.com/flipkart-incubator/Cuppa/master/fabfile.py">fabfile.py</a>.</p>
+        <h4>Configuration </h4>
+        <p>- See <a href="https://raw.githubusercontent.com/flipkart-incubator/Cuppa/master/conf">conf/</a> for configuration files and options</p>
+        <h4>Deploying to a cluster </h4>
+        <p>- Use your tool of choice to deploy caffe as a service and knn as a service to as many nodes as you require</p>
+        <p>- Setup a number of router instances </p>
+        <p>- Then update the router map with details of each instance </p>
+
+      </section>
+
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/flipkart-incubator">Flipkart</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
