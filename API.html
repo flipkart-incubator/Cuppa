@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Cuppa by Flipkart</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <a href="index.html"><img src="logos-3.png" alt="Cuppa" style="width: 50%; height: 50%" /></a>
+        <p>Caffe and KNN as a service</p>
+
+        <p class="view"><a href="https://github.com/flipkart-incubator/Cuppa">View the Project on GitHub <small>flipkart-incubator/Cuppa</small></a></p>
+        <p class="view"><a href="getting-started.html">Getting Started </a></p>
+        <p class="view"><a href="caffe-as-a-service.html">Caffe as a Service </a></p>
+          <p class="view"><a href="API.html">API </a></p>
+          <p class="view"><a href="knn-as-a-service.html">KNN as a service </a></p>
+        <ul>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/flipkart-incubator/Cuppa">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h3>
+<a id="intro" class="anchor" href="#intro" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>API Documentation</h3>
+        <p><b>Caffe Predict: </b></p>
+        <p>HTTP Request: POST /v1/caffe_model/predict</p>
+          <p>Request Body: JSON </p>
+          <pre>{
+    "url": image_url,
+    "modelId": model_id
+}</pre>
+          <p>Response on Success: </p>
+          <pre>A vector of numbers</pre>
+          <p>Response on Failure: </p>
+          <pre>Failure message and error code</pre>
+          <p><b>KNN Update: </b></p>
+          <p>HTTP Request: POST /v1/knn_model/update</p>
+          <p>Insert</p>
+          <p>Request Body: JSON </p>
+          <pre>{
+ 	"modelId": model_id,
+ 	"operation": "insert",
+ 	"dataPointId": data_point_id,
+ 	"vector": Array of data points,
+ 	"tags": Array of tags
+ }</pre>
+
+          <p>Delete</p>
+          <p>Request Body: JSON </p>
+          <pre>{
+ 	"modelId": model_id,
+ 	"operation": "delete",
+ 	"dataPointId": data_point_id
+ }</pre>
+          <p>Response on Success: </p>
+          <pre>200 OK</pre>
+          <p>Response on Failure: </p>
+          <pre>Failure message and error code</pre>
+
+          <p><b>KNN Predict: </b></p>
+          <p>HTTP Request: POST /v1/knn_model/predict</p>
+          <p>SearchById</p>
+          <p>Request Body: JSON </p>
+          <pre>{
+ 	"modelId": model_id,
+ 	"operation": "SearchById",
+ 	"dataPointId": data_point_id,
+	"tags": Array of tags
+ }</pre>
+          <p>SearchByVector</p>
+          <p>Request Body: JSON </p>
+          <pre>{
+ 	"modelId": model_id,
+ 	"operation": "SearchByVector",
+ 	"vector": Array of numbers,
+	"tags": Array of tags
+ }</pre>
+          <p>Response on Success: </p>
+          <pre>{
+  status: success
+  result: Top K nearest neighbours(Data point Ids) with distances
+}</pre>
+          <p>Response on Failure: </p>
+          <pre>Error code and failure message</pre>
+
+          <p><b>Router Map update: </b></p>
+          <p>HTTP Request: POST /v1/model_workers_map</p>
+          <p>Request Body: JSON </p>
+          <pre>{
+    "Caffe": {
+        model_id_1 : [{
+			"host": host_name,
+			"port": port_number,
+			"local_worker_id": local_worker_id
+		},{
+			"host": host_name,
+			"port": port_number,
+			"local_worker_id": local_worker_id
+		}]
+        model_id_2 : [{
+			"host": host_name,
+			"port": port_number,
+			"local_worker_id": local_worker_id
+		}]
+              .
+              .
+              .
+	}
+    "KNN":{
+        model_id_3 : [{
+			"host": host_name,
+			"port": port_number,
+			"local_worker_id": local_worker_id
+		}]
+        model_id_4 : [{
+			"host": host_name,
+			"port": port_number,
+			"local_worker_id": local_worker_id
+		}]
+              .
+              .
+              .
+	}
+}</pre>
+          <p>Response on Success: </p>
+          <pre>HTTP Response 200 OK.</pre>
+
+      </section>
+
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/flipkart-incubator">Flipkart</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+
+  </body>
+</html>
+
+
+
+
