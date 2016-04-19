@@ -146,12 +146,12 @@ class Record:
 
             self.logger.info('[OPERATION][INSERT][STOPPED]')
 
-            for uo in list_of_responses:
-                if uo.status == False:
-                    resp.status = falcon.HTTP_409
-                    resp.body = json.dumps({"status": uo.message})
-                    return
+        for uo in list_of_responses:
+            if uo.status == False:
+                resp.status = falcon.HTTP_409
+                resp.body = json.dumps({"status": uo.message})
+                return
 
-            resp.status = falcon.HTTP_200
-            resp.body = json.dumps({"status": 'Success'})
-            return
+        resp.status = falcon.HTTP_200
+        resp.body = json.dumps({"status": 'Success'})
+        return

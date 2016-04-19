@@ -6,8 +6,5 @@ import json
 for i in range(3):
     d = {"modelId":"model-1", "operation": "SearchById", "dataPointId": str(i), "tags": ["fdp-ml-test-tags"]}
     r = requests.post('http://localhost:8000/v1/knn_model/predict', data = json.dumps(d))
-    print len(r.json()['result'])
-    print r.status_code
-    print r.content
     assert(r.status_code == 200)
     assert(len(r.json()['result']) == misc_config['k'])

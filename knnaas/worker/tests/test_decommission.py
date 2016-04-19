@@ -26,6 +26,8 @@ from thrift.protocol.TBinaryProtocol import TBinaryProtocolAccelerated
 from knnaas.knnThrift import KnnThriftService
 from knnaas.knnThrift.ttypes import *
 from knnaas.knnThrift.constants import *
+from commons.src.config import config_loader
+worker_misc_config_path = "conf/knnaas_config.yaml"
 
 def get_client(host, port):
     trans = TSocket.TSocket(host, port)
@@ -36,7 +38,8 @@ def get_client(host, port):
 
 
 def _decommission():
-    client1, trans = get_client(host='localhost', port=9090)
+    misc_config = config_loader.get(worker_misc_config_path)
+    client1, trans = get_client(host=misc_config['host'], port=misc_config['port'])
     trans.open()
     resp1 = client1.decommission()
     assert(resp1.status == 'Success')

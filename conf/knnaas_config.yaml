@@ -1,6 +1,6 @@
 # Config file for KNN as a Service
 
-
+host: localhost
 # Port number on which to run the service. (Required)
 port: 9090
 

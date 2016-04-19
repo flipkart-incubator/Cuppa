@@ -131,8 +131,6 @@ class Predict:
                 resp.body = json.dumps({"message": message})
                 return
 
-            self.logger.info('[SEARCH_BY_ID_DONE]')
-        # Use full names instead of shortcuts for variable names
         list_result_records = knn_local_result.values
 
         if len(list_result_records) == 0:
