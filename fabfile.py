@@ -38,9 +38,6 @@ def setup():
     local('mkdir -p caffe_models')
     download_example_models()
     # add locale settings to bash_profile for ipython notebook to work
-    local('echo "export LC_ALL=en_US.UTF-8" >> ~/.bash_profile')
-    local('echo "export LANG=en_US.UTF-8" >> ~/.bash_profile')
-    local('source ~/.bash_profile')
 
 @task
 def make():
@@ -78,3 +75,7 @@ def start_knnaas():
 def stop_knnaas():
     local('python -m knnaas.worker.server stop conf/knnaas_config.yaml 0')
 
+@task
+def start_ipynb():
+    with lcd('examples'):
+        local('LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 ipython notebook --ip="*"')
